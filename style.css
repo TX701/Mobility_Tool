@@ -1,0 +1,14 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#mapContainer {
+    height: 99vh;
+    width: 100vw;
+}
+
+#map {
+    height: 100%
+}
