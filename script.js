@@ -1,6 +1,10 @@
 mapboxgl.accessToken = "pk.eyJ1IjoicnN0dmRldiIsImEiOiJjbWc4OGhzcjgwNTNxMmtwdGhlMWR3eDN2In0.Arna-I1oQmDjHKX-tmUIyg";
 let center = [-83.211269, 42.672954] // longitute, latitude
-let bounds = [[-83.255980, 42.625370], [-83.151353, 42.704894]];
+const bounds = [
+  [-83.22176640342447, 42.6522409656694], // southwest
+  [-83.19089575201713, 42.68139348920886] // northeast 
+];
+// let bounds = [[-83.1916, 42.6588], [-83.2237, 42.6795]];
 
 // large space that will be outside of our bounds, we use it so we can darken everything outside of oakland
 let wholeWord = [[-83.23946,42.6927258],[-83.238945,42.6925996],[-83.2387733,2.6394312],[-83.1568909,42.6389258],[-83.1570625,42.6941144],[-83.23946,42.6927258]];
@@ -40,12 +44,68 @@ const constructPinPoints = (data) => {
   });
 }
 
+const formSample = (data) => {
+  let formTestURL = `urlhere`;
+  let formProduction = `urlhere`;
+
+  let object = {};
+  data.forEach((value, key) => object[key] = value);
+  
+  console.log("Currently attempting to submit point to table.");
+  fetch(formProduction, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(object)
+  }).then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  }).then(data => {
+    console.log('Success:', data);
+    console.log("Point successfully added to the table.");
+  }).catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+const createForm = (e) => {
+  const formHtml = `<form id="point-form">
+                      <label for="difficulty">Ease:</label>
+                      <input type="number" id="difficulty" name="difficulty" required>
+                      <br>
+                      <label for="location">Location:</label>
+                      <input type="text" id="location" name="location" required>
+                      <br>
+                      <label for="description">Description:</label>
+                      <input type="text" id="description" name="description" required>
+                      <br>
+                      <button type="submit">Submit</button>
+                      <input type="hidden" id="long" name="long" value="${e.lngLat.lng}">
+                      <input type="hidden" id="lat" name="lat" value="${e.lngLat.lat}">
+                    </form>`
+  
+
+  document.querySelector("body").insertAdjacentHTML("beforeend", formHtml);
+  const form = document.querySelector("#point-form");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    formSample(new FormData(form));
+  });
+
+  form.style.position = "absolute";
+  form.style.left = `${e.point.x}px`;
+  form.style.top = `${e.point.y}px`;
+}
+
 const map = new mapboxgl.Map({
   container: "map",
   center: center, 
   style: "mapbox://styles/mapbox/standard",
-
-  // maxBounds: [[-83.181724, 42.68476011], [-83.231481, 42.683692], [-83.231115, 42.649170], [-83.176593, 42.649992]],
+  maxBounds: bounds,
   config: {
     basemap: {
       // lightPreset: "dusk",
@@ -75,5 +135,17 @@ map.on("load", () => {
         "paint": {
           "fill-color": "rgba(0, 0, 0, 0.6)",
         }
+    });
+
+    map.addInteraction('places-mouseenter-interaction', {
+      type: 'mouseenter',
+      target: { layerId: 'places' },
+      handler: () => {
+          map.getCanvas().style.cursor = 'pointer';
+      }
+    });
+
+    map.on("contextmenu", (e) => {
+      createForm(e);
     });
 });
