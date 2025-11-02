@@ -28,7 +28,7 @@ fetch(urlProduction)
     constructPinPoints(data);
   })
   .catch(error => {
-    console.error('Error:', error);
+    console.error("Error:", error);
 });
 
 let colorArray = ["#92F797", "#D2F792", "#EFF792", "#F7D292", "#F79292"];
@@ -45,17 +45,17 @@ const constructPinPoints = (data) => {
 }
 
 const formSample = (data) => {
-  let formTestURL = `urlhere`;
-  let formProduction = `urlhere`;
+  let formTestURL = `http://localhost:5678/webhook-test/d5d431ee-f5e0-4502-b90e-0df98caa9ebd`;
+  let formProduction = `http://localhost:5678/webhook/d5d431ee-f5e0-4502-b90e-0df98caa9ebd`;
 
   let object = {};
   data.forEach((value, key) => object[key] = value);
   
   console.log("Currently attempting to submit point to table.");
   fetch(formProduction, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json"
     },
     body: JSON.stringify(object)
   }).then(response => {
@@ -64,11 +64,22 @@ const formSample = (data) => {
     }
     return response.json();
   }).then(data => {
-    console.log('Success:', data);
+    console.log("Success:", data);
     console.log("Point successfully added to the table.");
   }).catch(error => {
-    console.error('Error:', error);
+    console.error("Error:", error);
   });
+}
+
+const formRemoveOnClick = () => {
+  document.querySelector("#point-form").remove();
+  document.querySelector("#mapContainer").removeEventListener("click", formRemoveOnClick);
+  document.querySelector("#mapContainer").removeEventListener("contextmenu", formRemoveOnClick);
+}
+
+const setFormEventListeners = () => {
+  document.querySelector("#mapContainer").addEventListener("click", formRemoveOnClick);
+  document.querySelector("#mapContainer").addEventListener("contextmenu", formRemoveOnClick);
 }
 
 const createForm = (e) => {
@@ -87,18 +98,22 @@ const createForm = (e) => {
                       <input type="hidden" id="lat" name="lat" value="${e.lngLat.lat}">
                     </form>`
   
-
-  document.querySelector("body").insertAdjacentHTML("beforeend", formHtml);
+  document.querySelector("body #container").insertAdjacentHTML("beforeend", formHtml);
   const form = document.querySelector("#point-form");
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     formSample(new FormData(form));
+    form.remove();
+    document.querySelector("#mapContainer").removeEventListener("click", formRemoveOnClick);
+    document.querySelector("#mapContainer").removeEventListener("contextmenu", formRemoveOnClick);
   });
 
   form.style.position = "absolute";
   form.style.left = `${e.point.x}px`;
   form.style.top = `${e.point.y}px`;
+
+  setFormEventListeners();
 }
 
 const map = new mapboxgl.Map({
@@ -137,11 +152,11 @@ map.on("load", () => {
         }
     });
 
-    map.addInteraction('places-mouseenter-interaction', {
-      type: 'mouseenter',
-      target: { layerId: 'places' },
+    map.addInteraction("places-mouseenter-interaction", {
+      type: "mouseenter",
+      target: { layerId: "places" },
       handler: () => {
-          map.getCanvas().style.cursor = 'pointer';
+          map.getCanvas().style.cursor = "pointer";
       }
     });
 
