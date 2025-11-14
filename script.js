@@ -1,6 +1,6 @@
 const urlBase = "https://transmental-preventively-christiana.ngrok-free.dev";
-const httpBase = "http://3.144.72.101:5678";
-mapboxgl.accessToken = "pk.eyJ1IjoicnN0dmRldiIsImEiOiJjbWc4OGhzcjgwNTNxMmtwdGhlMWR3eDN2In0.Arna-I1oQmDjHKX-tmUIyg";
+mapboxgl.accessToken = `${{ map_box_access_token }}`;
+
 let center = [-83.211269, 42.672954] // longitute, latitude
 const bounds = [
   [-83.22176640342447, 42.6522409656694], // southwest
@@ -16,8 +16,8 @@ let oakland = [[-83.19413, 42.68034], [-83.19321, 42.66018], [-83.19926, 42.6600
 // above oaklands coordinates are clockwise which is used when using two different polygons the first (counter clockwise) is the space and the second (clockwise) is a whole within that space. if we want to outline oakland alone we need its coordinates counterclockwise as well
 let counterClockWise = [[-83.1946, 42.68031], [-83.20196, 42.68019], [-83.20196, 42.68019], [-83.20641, 42.6801], [-83.20835, 42.68005], [-83.20935, 42.68003], [-83.21036, 42.68003], [-83.2114, 42.67985], [-83.21236, 42.67955], [-83.21328, 42.67926], [-83.21451, 42.67899], [-83.2153, 42.67886], [-83.21677, 42.67885], [-83.21752, 42.67881], [-83.21978, 42.67887], [-83.22088, 42.67889], [-83.22029, 42.67243], [-83.22027, 42.67176], [-83.22014, 42.67004], [-83.21998, 42.6686], [-83.21986, 42.66756], [-83.21978, 42.66668], [-83.21957, 42.66612], [-83.21923, 42.66533], [-83.21897, 42.66484], [-83.2182, 42.6633], [-83.21791, 42.6628], [-83.21759, 42.6621], [-83.21737, 42.66157], [-83.21723, 42.6609], [-83.21717, 42.66044], [-83.21711, 42.65937], [-83.21721, 42.65851], [-83.21741, 42.65776], [-83.21765, 42.65703], [-83.21793, 42.65638], [-83.21845, 42.65559], [-83.2194, 42.65417], [-83.21972, 42.65348], [-83.21976, 42.65311], [-83.21923, 42.65323], [-83.21843, 42.65347], [-83.2178, 42.65366], [-83.21693, 42.65391], [-83.21601, 42.65417], [-83.21503, 42.65453], [-83.2145, 42.65479], [-83.21388, 42.65505], [-83.21299, 42.65534], [-83.21027, 42.65613], [-83.20724, 42.65725], [-83.19926, 42.66002], [-83.19321, 42.66018], [-83.19413, 42.68034]]
 
-let urlTest = `${urlBase}/webhook-test/829cc1f7-0682-42cc-975e-7024ea52e8ba`; // testing the workflow
-let urlProduction = `${urlBase}/webhook/829cc1f7-0682-42cc-975e-7024ea52e8ba`;
+let urlTest = `${urlBase}/webhook-test/${{ webhook_form_data }}`; // testing the workflow
+let urlProduction = `${urlBase}/webhook/${{ webhook_form_data }}`;
 
 fetch(urlProduction, {
   headers: {
@@ -51,8 +51,8 @@ const constructPinPoints = (data) => {
 }
 
 const formSample = (data) => {
-  let formTestURL = `${urlBase}/webhook-test/d5d431ee-f5e0-4502-b90e-0df98caa9ebd`;
-  let formProduction = `${urlBase}/webhook/d5d431ee-f5e0-4502-b90e-0df98caa9ebd`;
+  let formTestURL = `${urlBase}/webhook-test/${{ webhook_send_data }}`;
+  let formProduction = `${urlBase}/webhook/${{ webhook_send_data }}`;
   
   let object = {};
   data.forEach((value, key) => object[key] = value);
@@ -121,7 +121,7 @@ const createForm = (e) => {
 
   setFormEventListeners();
 }
-// patSFwlLsqrQiQryx.8c95291e88b1cb089df66633d6e8b505d1809e554d4b09ccbff7a03afc7e0988 <= airtable token
+
 const map = new mapboxgl.Map({
   container: "map",
   center: center, 
@@ -170,46 +170,3 @@ map.on("load", () => {
       createForm(e);
     });
 });
-
-
-// const https = require('https');
-
-//   exports.handler = async (event) => {
-//       const postData = JSON.stringify({
-//           // Your data to send to n8n
-//           key: 'value'
-//       });
-
-//       const options = {
-//           hostname: 'your-n8n-domain.com', // Replace with your n8n domain
-//           port: 443,
-//           path: '/webhook/your-n8n-webhook-path', // Replace with your webhook path
-//           method: 'POST',
-//           headers: {
-//               'Content-Type': 'application/json',
-//               'Content-Length': Buffer.byteLength(postData)
-//           }
-//       };
-
-//       return new Promise((resolve, reject) => {
-//           const req = https.request(options, (res) => {
-//               let data = '';
-//               res.on('data', (chunk) => {
-//                   data += chunk;
-//               });
-//               res.on('end', () => {
-//                   resolve({
-//                       statusCode: res.statusCode,
-//                       body: data
-//                   });
-//               });
-//           });
-
-//           req.on('error', (e) => {
-//               reject(e);
-//           });
-
-//           req.write(postData);
-//           req.end();
-//       });
-//   };
